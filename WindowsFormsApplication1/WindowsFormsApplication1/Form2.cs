@@ -13,10 +13,15 @@ namespace WindowsFormsApplication1
 {
     public partial class Form2 : Form
     {
-        public Form2()
+       public string _imageName;
+       public  bool showFourierImage = false;
+        public Form2(string imageName)
         {
+            _imageName = imageName;
             InitializeComponent();
             this.Paint+=Form2_Paint;
+
+            showFourierImage = true;
         }
 
         private void Form2_Paint(object sender, PaintEventArgs e)
@@ -28,10 +33,16 @@ namespace WindowsFormsApplication1
 
             try
             {
-                Bitmap originalImage = (Bitmap)Bitmap.FromFile(@"batman-logo.gif");
+                /*IMAGES
+
+                 * batman-logo.gif
+                 * halfhalf.png
+                 * 
+                 * */
+                Bitmap originalImage = (Bitmap)Bitmap.FromFile(_imageName);
                 // create complex image
                 Bitmap img8bit = BM.CopyToBpp(originalImage, 8);
-                g.DrawImage(img8bit, new Point(0, 0));
+               // g.DrawImage(img8bit, new Point(0, 0));
                 using (Bitmap large = new Bitmap(512, 512, g))
                 {
                     using (Graphics largeGraphics = Graphics.FromImage(large))
@@ -41,7 +52,14 @@ namespace WindowsFormsApplication1
                         complexImage.ForwardFourierTransform();
                         // get complex image as bitmat
                         Bitmap fourierImage = complexImage.ToBitmap();
-                        g.DrawImage(fourierImage, 0,0,this.Width,this.Height);
+                        if (showFourierImage)
+                        {
+                            g.DrawImage(fourierImage, 0, 0, this.Width, this.Height);
+                        }
+                        else
+                        {
+                            g.DrawImage(originalImage, 0, 0, this.Width, this.Height);
+                        }
                     }
                 }
 

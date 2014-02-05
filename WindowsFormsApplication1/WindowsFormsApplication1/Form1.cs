@@ -19,18 +19,29 @@ namespace WindowsFormsApplication1
         public static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int Y, int cx, int cy, int wFlags);
 
 
-        Form form2 = new WindowsFormsApplication1.Form2();
+        //Form form2 = new WindowsFormsApplication1.Form2();
 
         const short SWP_NOMOVE = 0X2;
         const short SWP_NOSIZE = 1;
         const short SWP_NOZORDER = 0X4;
         const int SWP_SHOWWINDOW = 0x0040;
+        public static string imageName = "fresnelLens.gif";
 
+        public List<Form> forms = new List<Form>();
+
+        Bitmap originalImage;
+        Bitmap img8bit;
+        Bitmap fourierImage;
 
         public Form1()
         {
             InitializeComponent();
-            this.Paint+=Form1_Paint;
+            this.panel1.Paint += Panel1_Paint;
+            
+            
+
+            this.panel2.Paint += Panel2_Paint;
+            
 
             int index;
             int upperBound; 
@@ -51,16 +62,17 @@ namespace WindowsFormsApplication1
                 
 
 
-                int x = screens[index].Bounds.Left;
-                int y =screens[index].Bounds.Top;
-                int cx = screens[index].Bounds.Right;
-                int cy = screens[index].Bounds.Height;
+                
 
                 
 
-                if (index == 1)
+                if (index >=1 )
                 {
-                    
+                    int x = screens[index].Bounds.Left;
+                    int y = screens[index].Bounds.Top;
+                    int cx = screens[index].Bounds.Right;
+                    int cy = screens[index].Bounds.Height;
+                    Form2 form2 = new Form2(imageName);
                     form2.Size = new Size(cx, cy);
                     SetWindowPos(form2.Handle, 0, x, y, cx, cy, SWP_NOZORDER | SWP_NOSIZE | SWP_SHOWWINDOW);
                     form2.TopMost = true;
@@ -70,37 +82,32 @@ namespace WindowsFormsApplication1
 
                     form2.WindowState = FormWindowState.Maximized;
                     form2.Show();
+                    forms.Add(form2);
                 }
 
             }
-            
+            this.panel1.Invalidate();
+            this.panel2.Invalidate();
         }
 
-        private void Form1_Paint(object sender, PaintEventArgs e)
+        private void CalculateImages()
         {
-            DrawStuff(e.Graphics);
+            originalImage = (Bitmap)Bitmap.FromFile(imageName);
+            // create complex image
+            img8bit = BM.CopyToBpp(originalImage, 8);
+            ComplexImage complexImage = ComplexImage.FromBitmap(img8bit);
+            // do forward Fourier transformation
+            complexImage.ForwardFourierTransform();
+            // get complex image as bitmat
+            fourierImage = complexImage.ToBitmap();
         }
-        private void DrawStuff(Graphics g)
+        private void Panel1_Paint(object sender, PaintEventArgs e)
         {
-
-            try
+            Graphics g = e.Graphics;
+                try
             {
-                Bitmap originalImage = (Bitmap)Bitmap.FromFile(@"batman-logo.gif");
-                // create complex image
-                Bitmap img8bit = BM.CopyToBpp(originalImage, 8);
-                g.DrawImage(img8bit, new Point(0, 0));
-                using (Bitmap large = new Bitmap(512, 512, g))
-                {
-                    using (Graphics largeGraphics = Graphics.FromImage(large))
-                    {
-                        ComplexImage complexImage = ComplexImage.FromBitmap(img8bit);
-                        // do forward Fourier transformation
-                        complexImage.ForwardFourierTransform();
-                        // get complex image as bitmat
-                        Bitmap fourierImage = complexImage.ToBitmap();
-                        g.DrawImage(fourierImage, 512, 0);
-                    }
-                }
+                CalculateImages();
+                g.DrawImage(img8bit, new Rectangle(new Point(0, 0), new Size(panel1.Width, panel1.Height)));
 
                 g.Dispose();
             }
@@ -109,6 +116,91 @@ namespace WindowsFormsApplication1
 
             }
         }
+        private void Panel2_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            try
+            {
+                CalculateImages();
+                g.DrawImage(fourierImage, new Rectangle(new Point(0, 0), new Size(panel2.Width, panel2.Height)));
 
+
+                g.Dispose();
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        private void button1_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog oFDialog = new OpenFileDialog();
+            if (oFDialog.ShowDialog() == DialogResult.OK)
+            {
+                //update the ui display
+                imageName = oFDialog.FileName;
+                this.panel1.Invalidate();
+                this.panel2.Invalidate();
+
+                //update the SLM and other monitor
+                foreach (Form2 form in forms)
+                {
+                    form._imageName = oFDialog.FileName;
+                }
+                //update the label showing which file is open
+                labelSelectedImage.InvokeIfRequired(() =>
+                {
+                    this.labelSelectedImage.Text = String.Format("Selected Image: {0}", oFDialog.SafeFileName);
+                });
+
+                
+            }
+            
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toggleDisplayImage_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.toggleDisplayImage.Checked)
+            {
+                this.toggleDisplayImage.Text = "Original Image";
+                foreach (Form2 form in forms)
+                {
+                    form.showFourierImage = false;
+                    form.Invalidate();
+                }
+            }
+            else
+            {
+                this.toggleDisplayImage.Text = "Fourier Image";
+                foreach (Form2 form in forms)
+                {
+                    form.showFourierImage = true;
+                    form.Invalidate();
+                }
+            }
+        }
+        
+        
+        
+
+    }
+    public static class Extensions
+    {
+        public static void InvokeIfRequired(this Label label, MethodInvoker action)
+        {
+            if (label.InvokeRequired)
+            {
+                label.Invoke(action);
+            }
+            else
+            {
+                action();
+            }
+        }
     }
 }
