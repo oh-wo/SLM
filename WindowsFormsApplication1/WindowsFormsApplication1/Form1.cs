@@ -58,6 +58,7 @@ namespace WindowsFormsApplication1
                 listBox1.Items.Add("Type: " + screens[index].GetType().ToString());
                 listBox1.Items.Add("Working Area: " + screens[index].WorkingArea.ToString());
                 listBox1.Items.Add("Primary Screen: " + screens[index].Primary.ToString());
+                listBox1.Items.Add("Index:" + index);
                 listBox1.Items.Add(""); listBox1.Items.Add(""); listBox1.Items.Add("");
                 
 
@@ -66,7 +67,7 @@ namespace WindowsFormsApplication1
 
                 
 
-                if (index >=1 )
+                if (index !=2)
                 {
                     int x = screens[index].Bounds.Left;
                     int y = screens[index].Bounds.Top;
