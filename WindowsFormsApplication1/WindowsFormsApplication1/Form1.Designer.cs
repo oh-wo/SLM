@@ -29,16 +29,27 @@
         private void InitializeComponent()
         {
             this.listBox1 = new System.Windows.Forms.ListBox();
-            this.performanceCounter1 = new System.Diagnostics.PerformanceCounter();
-            this.button1 = new System.Windows.Forms.Button();
-            this.labelSelectedImage = new System.Windows.Forms.Label();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.toggleDisplayImage = new System.Windows.Forms.CheckBox();
+            this.groupBoxOption = new System.Windows.Forms.GroupBox();
+            this.radioFourierTilt = new System.Windows.Forms.RadioButton();
+            this.radioRawImage = new System.Windows.Forms.RadioButton();
+            this.radioFourierImage = new System.Windows.Forms.RadioButton();
+            this.panelImage = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
-            ((System.ComponentModel.ISupportInitialize)(this.performanceCounter1)).BeginInit();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.panel3 = new System.Windows.Forms.Panel();
+            this.labelSelectedImage = new System.Windows.Forms.Label();
+            this.buttonOpenImage = new System.Windows.Forms.Button();
+            this.panelTilt = new System.Windows.Forms.Panel();
+            this.trackBarXAngle = new System.Windows.Forms.TrackBar();
+            this.textXangle = new System.Windows.Forms.TextBox();
+            this.panelTiltImage = new System.Windows.Forms.Panel();
+            this.checkBoxCalibration = new System.Windows.Forms.CheckBox();
+            this.groupBoxOption.SuspendLayout();
+            this.panelImage.SuspendLayout();
+            this.panelTilt.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarXAngle)).BeginInit();
             this.SuspendLayout();
             // 
             // listBox1
@@ -49,112 +60,212 @@
             this.listBox1.Size = new System.Drawing.Size(252, 433);
             this.listBox1.TabIndex = 0;
             // 
-            // button1
+            // groupBoxOption
             // 
-            this.button1.Location = new System.Drawing.Point(270, 12);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(107, 23);
-            this.button1.TabIndex = 1;
-            this.button1.Text = "open image..";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.groupBoxOption.Controls.Add(this.radioFourierTilt);
+            this.groupBoxOption.Controls.Add(this.radioRawImage);
+            this.groupBoxOption.Controls.Add(this.radioFourierImage);
+            this.groupBoxOption.Location = new System.Drawing.Point(270, 12);
+            this.groupBoxOption.Name = "groupBoxOption";
+            this.groupBoxOption.Size = new System.Drawing.Size(200, 100);
+            this.groupBoxOption.TabIndex = 12;
+            this.groupBoxOption.TabStop = false;
+            this.groupBoxOption.Text = "Operation type";
             // 
-            // labelSelectedImage
+            // radioFourierTilt
             // 
-            this.labelSelectedImage.AutoSize = true;
-            this.labelSelectedImage.Location = new System.Drawing.Point(270, 38);
-            this.labelSelectedImage.Name = "labelSelectedImage";
-            this.labelSelectedImage.Size = new System.Drawing.Size(120, 13);
-            this.labelSelectedImage.TabIndex = 2;
-            this.labelSelectedImage.Text = "Selected Image:  (none)";
+            this.radioFourierTilt.AutoSize = true;
+            this.radioFourierTilt.Checked = true;
+            this.radioFourierTilt.Location = new System.Drawing.Point(6, 19);
+            this.radioFourierTilt.Name = "radioFourierTilt";
+            this.radioFourierTilt.Size = new System.Drawing.Size(70, 17);
+            this.radioFourierTilt.TabIndex = 12;
+            this.radioFourierTilt.TabStop = true;
+            this.radioFourierTilt.Text = "Fourier tilt";
+            this.radioFourierTilt.UseVisualStyleBackColor = true;
             // 
-            // panel1
+            // radioRawImage
             // 
-            this.panel1.Location = new System.Drawing.Point(519, 12);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(315, 211);
-            this.panel1.TabIndex = 4;
+            this.radioRawImage.AutoSize = true;
+            this.radioRawImage.Location = new System.Drawing.Point(6, 66);
+            this.radioRawImage.Name = "radioRawImage";
+            this.radioRawImage.Size = new System.Drawing.Size(79, 17);
+            this.radioRawImage.TabIndex = 14;
+            this.radioRawImage.Text = "Raw Image";
+            this.radioRawImage.UseVisualStyleBackColor = true;
             // 
-            // panel2
+            // radioFourierImage
             // 
-            this.panel2.Location = new System.Drawing.Point(519, 229);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(315, 211);
-            this.panel2.TabIndex = 5;
+            this.radioFourierImage.AutoSize = true;
+            this.radioFourierImage.Location = new System.Drawing.Point(6, 43);
+            this.radioFourierImage.Name = "radioFourierImage";
+            this.radioFourierImage.Size = new System.Drawing.Size(89, 17);
+            this.radioFourierImage.TabIndex = 13;
+            this.radioFourierImage.Text = "Fourier Image";
+            this.radioFourierImage.UseVisualStyleBackColor = true;
             // 
-            // label1
+            // panelImage
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(436, 229);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(77, 13);
-            this.label1.TabIndex = 6;
-            this.label1.Text = "Fourier Image: ";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(436, 12);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(80, 13);
-            this.label2.TabIndex = 6;
-            this.label2.Text = "Original Image: ";
-            // 
-            // toggleDisplayImage
-            // 
-            this.toggleDisplayImage.Appearance = System.Windows.Forms.Appearance.Button;
-            this.toggleDisplayImage.AutoSize = true;
-            this.toggleDisplayImage.Location = new System.Drawing.Point(273, 147);
-            this.toggleDisplayImage.Name = "toggleDisplayImage";
-            this.toggleDisplayImage.Size = new System.Drawing.Size(81, 23);
-            this.toggleDisplayImage.TabIndex = 7;
-            this.toggleDisplayImage.Text = "Fourier Image";
-            this.toggleDisplayImage.UseVisualStyleBackColor = true;
-            this.toggleDisplayImage.CheckedChanged += new System.EventHandler(this.toggleDisplayImage_CheckedChanged);
+            this.panelImage.Controls.Add(this.label3);
+            this.panelImage.Controls.Add(this.label2);
+            this.panelImage.Controls.Add(this.label1);
+            this.panelImage.Controls.Add(this.panel2);
+            this.panelImage.Controls.Add(this.panel3);
+            this.panelImage.Controls.Add(this.labelSelectedImage);
+            this.panelImage.Controls.Add(this.buttonOpenImage);
+            this.panelImage.Location = new System.Drawing.Point(552, 11);
+            this.panelImage.Name = "panelImage";
+            this.panelImage.Size = new System.Drawing.Size(637, 446);
+            this.panelImage.TabIndex = 13;
+            this.panelImage.Visible = false;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(273, 128);
+            this.label3.Location = new System.Drawing.Point(6, 120);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(103, 13);
-            this.label3.TabIndex = 8;
+            this.label3.TabIndex = 15;
             this.label3.Text = "Currently displaying: ";
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(202, 9);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(80, 13);
+            this.label2.TabIndex = 13;
+            this.label2.Text = "Original Image: ";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(202, 226);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(77, 13);
+            this.label1.TabIndex = 14;
+            this.label1.Text = "Fourier Image: ";
+            // 
+            // panel2
+            // 
+            this.panel2.Location = new System.Drawing.Point(285, 226);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(315, 211);
+            this.panel2.TabIndex = 12;
+            // 
+            // panel3
+            // 
+            this.panel3.Location = new System.Drawing.Point(285, 9);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(315, 211);
+            this.panel3.TabIndex = 11;
+            // 
+            // labelSelectedImage
+            // 
+            this.labelSelectedImage.AutoSize = true;
+            this.labelSelectedImage.Location = new System.Drawing.Point(3, 30);
+            this.labelSelectedImage.Name = "labelSelectedImage";
+            this.labelSelectedImage.Size = new System.Drawing.Size(120, 13);
+            this.labelSelectedImage.TabIndex = 10;
+            this.labelSelectedImage.Text = "Selected Image:  (none)";
+            // 
+            // buttonOpenImage
+            // 
+            this.buttonOpenImage.Location = new System.Drawing.Point(3, 4);
+            this.buttonOpenImage.Name = "buttonOpenImage";
+            this.buttonOpenImage.Size = new System.Drawing.Size(107, 23);
+            this.buttonOpenImage.TabIndex = 9;
+            this.buttonOpenImage.Text = "open image..";
+            this.buttonOpenImage.UseVisualStyleBackColor = true;
+            this.buttonOpenImage.Click += new System.EventHandler(this.buttonOpenImage_Click);
+            // 
+            // panelTilt
+            // 
+            this.panelTilt.Controls.Add(this.panelTiltImage);
+            this.panelTilt.Controls.Add(this.checkBoxCalibration);
+            this.panelTilt.Controls.Add(this.trackBarXAngle);
+            this.panelTilt.Controls.Add(this.textXangle);
+            this.panelTilt.Location = new System.Drawing.Point(552, 11);
+            this.panelTilt.Name = "panelTilt";
+            this.panelTilt.Size = new System.Drawing.Size(637, 446);
+            this.panelTilt.TabIndex = 14;
+            // 
+            // trackBarXAngle
+            // 
+            this.trackBarXAngle.Location = new System.Drawing.Point(10, 63);
+            this.trackBarXAngle.Name = "trackBarXAngle";
+            this.trackBarXAngle.Size = new System.Drawing.Size(104, 45);
+            this.trackBarXAngle.TabIndex = 1;
+            // 
+            // textXangle
+            // 
+            this.textXangle.Location = new System.Drawing.Point(10, 33);
+            this.textXangle.Name = "textXangle";
+            this.textXangle.Size = new System.Drawing.Size(100, 20);
+            this.textXangle.TabIndex = 0;
+            // 
+            // panelTiltImage
+            // 
+            this.panelTiltImage.Location = new System.Drawing.Point(151, 32);
+            this.panelTiltImage.Name = "panelTiltImage";
+            this.panelTiltImage.Size = new System.Drawing.Size(449, 370);
+            this.panelTiltImage.TabIndex = 2;
+            // 
+            // checkBoxCalibration
+            // 
+            this.checkBoxCalibration.AutoSize = true;
+            this.checkBoxCalibration.Checked = true;
+            this.checkBoxCalibration.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.checkBoxCalibration.Location = new System.Drawing.Point(10, 202);
+            this.checkBoxCalibration.Name = "checkBoxCalibration";
+            this.checkBoxCalibration.Size = new System.Drawing.Size(113, 17);
+            this.checkBoxCalibration.TabIndex = 3;
+            this.checkBoxCalibration.Text = "Inlcude Calibration";
+            this.checkBoxCalibration.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1201, 460);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.toggleDisplayImage);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.panel2);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.labelSelectedImage);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.panelTilt);
+            this.Controls.Add(this.panelImage);
+            this.Controls.Add(this.groupBoxOption);
             this.Controls.Add(this.listBox1);
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.groupBoxOption.ResumeLayout(false);
+            this.groupBoxOption.PerformLayout();
+            this.panelImage.ResumeLayout(false);
+            this.panelImage.PerformLayout();
+            this.panelTilt.ResumeLayout(false);
+            this.panelTilt.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarXAngle)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
         private System.Windows.Forms.ListBox listBox1;
-        private System.Diagnostics.PerformanceCounter performanceCounter1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label labelSelectedImage;
-        private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.CheckBox toggleDisplayImage;
+        private System.Windows.Forms.GroupBox groupBoxOption;
+        private System.Windows.Forms.RadioButton radioFourierTilt;
+        private System.Windows.Forms.RadioButton radioRawImage;
+        private System.Windows.Forms.RadioButton radioFourierImage;
+        private System.Windows.Forms.Panel panelImage;
         private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.Label labelSelectedImage;
+        private System.Windows.Forms.Button buttonOpenImage;
+        private System.Windows.Forms.Panel panelTilt;
+        private System.Windows.Forms.TrackBar trackBarXAngle;
+        private System.Windows.Forms.TextBox textXangle;
+        private System.Windows.Forms.Panel panelTiltImage;
+        private System.Windows.Forms.CheckBox checkBoxCalibration;
 
     }
 }

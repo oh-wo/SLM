@@ -40,6 +40,8 @@ namespace WindowsFormsApplication1
                  * 
                  * */
                 Bitmap originalImage = (Bitmap)Bitmap.FromFile(_imageName);
+                int newHeight = int.Parse(Math.Pow(2, Math.Ceiling(Math.Log(originalImage.Height) / Math.Log(2))).ToString());
+                originalImage = Form1.resizeImage(originalImage, new System.Drawing.Size(newHeight, newHeight));
                 // create complex image
                 Bitmap img8bit = BM.CopyToBpp(originalImage, 8);
                // g.DrawImage(img8bit, new Point(0, 0));

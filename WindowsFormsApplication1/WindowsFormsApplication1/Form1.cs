@@ -35,24 +35,17 @@ namespace WindowsFormsApplication1
 
         public Form1()
         {
-            InitializeComponent();
-            this.panel1.Paint += Panel1_Paint;
-            
-            
-
-            this.panel2.Paint += Panel2_Paint;
-            
-
-            int index;
-            int upperBound; 
-            Screen[] screens = Screen.AllScreens;
-            upperBound = screens.GetUpperBound(0);
-        
-            for (index = 0; index <= upperBound; index++)
+            try
             {
+                InitializeComponent();
+                this.panel3.Paint += Panel3_Paint;
+                this.panelTiltImage.Paint += panelTiltImage_Paint;
 
-                // For each screen, add the screen properties to a list box.
 
+                this.panel2.Paint += Panel2_Paint;
+
+
+<<<<<<< HEAD
                 listBox1.Items.Add("Device Name: " + screens[index].DeviceName);
                 listBox1.Items.Add("Bounds: " + screens[index].Bounds.ToString());
                 listBox1.Items.Add("Type: " + screens[index].GetType().ToString());
@@ -61,12 +54,30 @@ namespace WindowsFormsApplication1
                 listBox1.Items.Add("Index:" + index);
                 listBox1.Items.Add(""); listBox1.Items.Add(""); listBox1.Items.Add("");
                 
+=======
+                int index;
+                int upperBound;
+                Screen[] screens = Screen.AllScreens;
+                upperBound = screens.GetUpperBound(0);
+
+                for (index = 0; index <= upperBound; index++)
+                {
+
+                    // For each screen, add the screen properties to a list box.
+
+                    listBox1.Items.Add("Device Name: " + screens[index].DeviceName);
+                    listBox1.Items.Add("Bounds: " + screens[index].Bounds.ToString());
+                    listBox1.Items.Add("Type: " + screens[index].GetType().ToString());
+                    listBox1.Items.Add("Working Area: " + screens[index].WorkingArea.ToString());
+                    listBox1.Items.Add("Primary Screen: " + screens[index].Primary.ToString());
+                    listBox1.Items.Add(""); listBox1.Items.Add(""); listBox1.Items.Add("");
+
+>>>>>>> cc97056c14c9b73d9727285e345c8715208425eb
 
 
-                
 
-                
 
+<<<<<<< HEAD
                 if (index !=2)
                 {
                     int x = screens[index].Bounds.Left;
@@ -77,23 +88,58 @@ namespace WindowsFormsApplication1
                     form2.Size = new Size(cx, cy);
                     SetWindowPos(form2.Handle, 0, x, y, cx, cy, SWP_NOZORDER | SWP_NOSIZE | SWP_SHOWWINDOW);
                     form2.TopMost = true;
+=======
+>>>>>>> cc97056c14c9b73d9727285e345c8715208425eb
 
-                    form2.FormBorderStyle = FormBorderStyle.None;
+
+                    if (index >= 1)
+                    {
+                        int x = screens[index].Bounds.Left;
+                        int y = screens[index].Bounds.Top;
+                        int cx = screens[index].Bounds.Right;
+                        int cy = screens[index].Bounds.Height;
+                        Form2 form2 = new Form2(imageName);
+                        form2.Size = new Size(cx, cy);
+                        SetWindowPos(form2.Handle, 0, x, y, cx, cy, SWP_NOZORDER | SWP_NOSIZE | SWP_SHOWWINDOW);
+                        form2.TopMost = true;
+
+                        form2.FormBorderStyle = FormBorderStyle.None;
 
 
-                    form2.WindowState = FormWindowState.Maximized;
-                    form2.Show();
-                    forms.Add(form2);
+                        form2.WindowState = FormWindowState.Maximized;
+                        form2.Show();
+                        forms.Add(form2);
+                    }
+
+                }
+                this.panel3.Invalidate();
+                this.panel2.Invalidate();
+                foreach (RadioButton radio in this.groupBoxOption.Controls.OfType<RadioButton>().ToList())
+                {
+                    radio.CheckedChanged += radioCheckedChanged;
                 }
 
+                this.textXangle.KeyUp += textXangle_KeyUp;
+                this.calibrationImage = (Bitmap)Bitmap.FromFile(tiltImageName);
+                this.checkBoxCalibration.CheckedChanged += checkBoxCalibration_CheckedChanged;
             }
-            this.panel1.Invalidate();
-            this.panel2.Invalidate();
-        }
+            catch (Exception ex)
+            {
+                System.IO.StreamWriter file = new System.IO.StreamWriter("c:\\errorLog.txt");
+                file.WriteLine(ex.InnerException);
 
+                file.Close();
+            }
+        }
+        public static Bitmap resizeImage(Bitmap imgToResize, Size size)
+        {
+            return (new Bitmap(imgToResize, size));
+        }
         private void CalculateImages()
         {
             originalImage = (Bitmap)Bitmap.FromFile(imageName);
+            int newHeight = int.Parse(Math.Pow(2, Math.Ceiling(Math.Log(originalImage.Height)/Math.Log(2))).ToString());
+            originalImage = resizeImage(originalImage, new System.Drawing.Size(newHeight, newHeight));
             // create complex image
             img8bit = BM.CopyToBpp(originalImage, 8);
             ComplexImage complexImage = ComplexImage.FromBitmap(img8bit);
@@ -101,14 +147,17 @@ namespace WindowsFormsApplication1
             complexImage.ForwardFourierTransform();
             // get complex image as bitmat
             fourierImage = complexImage.ToBitmap();
+
         }
-        private void Panel1_Paint(object sender, PaintEventArgs e)
+
+     
+        private void Panel3_Paint(object sender, PaintEventArgs e)
         {
             Graphics g = e.Graphics;
                 try
             {
                 CalculateImages();
-                g.DrawImage(img8bit, new Rectangle(new Point(0, 0), new Size(panel1.Width, panel1.Height)));
+                g.DrawImage(img8bit, new Rectangle(new Point(0, 0), new Size(panel3.Width, panel3.Height)));
 
                 g.Dispose();
             }
@@ -133,20 +182,133 @@ namespace WindowsFormsApplication1
 
             }
         }
-        private void button1_Click(object sender, EventArgs e)
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void radioCheckedChanged(object sender, EventArgs e)
+        {
+            if (((RadioButton)sender).Checked)
+            {//otherwise this event will fire (and run) for as many radio buttons as there are...
+                string checkedName = this.groupBoxOption.Controls.OfType<RadioButton>()
+                               .FirstOrDefault(n => n.Checked).Name;
+                switch (checkedName)
+                {
+                    case "radioFourierTilt":
+                        this.panelImage.Visible = false;
+                        break;
+                    case "radioRawImage":
+                        this.panelImage.Visible = true;
+                        foreach (Form2 form in forms)
+                        {
+                            form.showFourierImage = false;
+                            form.Invalidate();
+                        }
+                        break;
+                    case "radioFourierImage":
+                        this.panelImage.Visible = true;
+                        foreach (Form2 form in forms)
+                        {
+                            form.showFourierImage = true;
+                            form.Invalidate();
+                        }
+                        break;
+                }
+            }
+           
+        }
+        private void textXangle_KeyUp(object Sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                makeTiltImage();
+            }
+        }
+        private void makeTiltImage()
+        {
+            int _width = this.panelTiltImage.Width;
+            int _height = this.panelTiltImage.Height;
+            tiltImage = new Bitmap(_width,_height);
+
+            double thetaXD = double.Parse(this.textXangle.Text);
+            double thetaX = Math.PI/180*thetaXD;
+
+            double[,] x = new double[_width, _height];
+            double[,] y = new double[_width, _height];
+            int color;
+            double max = 0;
+            double coeff = 2 * Math.PI / (double)(800 * Math.Pow(10,-9)) * Math.Sin(thetaX);
+            for (int i = 0; i < _height; i++)
+            {
+                for (double j = 0; j < _width; j+=1)
+                {
+                    x[(int)j, (int)i] = coeff *j;
+                    if (x[(int)j, (int)i] > max)
+                        max = x[(int)j, (int)i];
+                }
+            }
+
+            int[,] xi = new int[_width, _height];
+            
+            for (int i = 0; i < _height; i++)
+            {
+                for (int j = 0; j < _width; j++)
+                {
+                    xi[j, i] = int.Parse(Math.Round(x[j, i] / max * 255).ToString());
+                    if (this.checkBoxCalibration.Checked)
+                    {
+                      // xi[j, i] += calibrationImage.GetPixel(j, i).A;
+                    }
+                    tiltImage.SetPixel(j, i, Color.FromArgb(xi[j, i], xi[j, i], xi[j, i]));
+                }
+            }
+
+            tiltImage.Save("testtest56.bmp");
+
+            this.panelTiltImage.Invalidate();
+        }
+        Bitmap calibrationImage;
+        Bitmap tiltImage;
+        string tiltImageName = "LSH0600812_850nm_calibration.bmp";
+
+
+
+        private void panelTiltImage_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics g = e.Graphics;
+            try
+            {
+                g.DrawImage(tiltImage, new Rectangle(new Point(0, 0), new Size(this.panelTiltImage.Width, this.panelTiltImage.Height)));
+
+                g.Dispose();
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+        private void checkBoxCalibration_CheckedChanged(object sender, EventArgs e)
+        {
+            makeTiltImage();
+        }
+
+        private void buttonOpenImage_Click(object sender, EventArgs e)
         {
             OpenFileDialog oFDialog = new OpenFileDialog();
             if (oFDialog.ShowDialog() == DialogResult.OK)
             {
                 //update the ui display
                 imageName = oFDialog.FileName;
-                this.panel1.Invalidate();
+                this.panel3.Invalidate();
                 this.panel2.Invalidate();
 
                 //update the SLM and other monitor
                 foreach (Form2 form in forms)
                 {
                     form._imageName = oFDialog.FileName;
+                    form.Invalidate();
                 }
                 //update the label showing which file is open
                 labelSelectedImage.InvokeIfRequired(() =>
@@ -154,42 +316,15 @@ namespace WindowsFormsApplication1
                     this.labelSelectedImage.Text = String.Format("Selected Image: {0}", oFDialog.SafeFileName);
                 });
 
-                
+
             }
             
         }
-
-        private void Form1_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void toggleDisplayImage_CheckedChanged(object sender, EventArgs e)
-        {
-            if (this.toggleDisplayImage.Checked)
-            {
-                this.toggleDisplayImage.Text = "Original Image";
-                foreach (Form2 form in forms)
-                {
-                    form.showFourierImage = false;
-                    form.Invalidate();
-                }
-            }
-            else
-            {
-                this.toggleDisplayImage.Text = "Fourier Image";
-                foreach (Form2 form in forms)
-                {
-                    form.showFourierImage = true;
-                    form.Invalidate();
-                }
-            }
-        }
-        
-        
         
 
     }
+
+
     public static class Extensions
     {
         public static void InvokeIfRequired(this Label label, MethodInvoker action)
