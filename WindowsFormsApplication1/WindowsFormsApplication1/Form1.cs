@@ -39,26 +39,14 @@ namespace WindowsFormsApplication1
             {
                 InitializeComponent();
                 this.panel3.Paint += Panel3_Paint;
+                this.panel2.Paint += Panel2_Paint;
                 this.panelTiltImage.Paint += panelTiltImage_Paint;
 
-
-                this.panel2.Paint += Panel2_Paint;
-
-
-<<<<<<< HEAD
-                listBox1.Items.Add("Device Name: " + screens[index].DeviceName);
-                listBox1.Items.Add("Bounds: " + screens[index].Bounds.ToString());
-                listBox1.Items.Add("Type: " + screens[index].GetType().ToString());
-                listBox1.Items.Add("Working Area: " + screens[index].WorkingArea.ToString());
-                listBox1.Items.Add("Primary Screen: " + screens[index].Primary.ToString());
-                listBox1.Items.Add("Index:" + index);
-                listBox1.Items.Add(""); listBox1.Items.Add(""); listBox1.Items.Add("");
-                
-=======
                 int index;
                 int upperBound;
                 Screen[] screens = Screen.AllScreens;
                 upperBound = screens.GetUpperBound(0);
+
 
                 for (index = 0; index <= upperBound; index++)
                 {
@@ -72,27 +60,8 @@ namespace WindowsFormsApplication1
                     listBox1.Items.Add("Primary Screen: " + screens[index].Primary.ToString());
                     listBox1.Items.Add(""); listBox1.Items.Add(""); listBox1.Items.Add("");
 
->>>>>>> cc97056c14c9b73d9727285e345c8715208425eb
 
-
-
-
-<<<<<<< HEAD
-                if (index !=2)
-                {
-                    int x = screens[index].Bounds.Left;
-                    int y = screens[index].Bounds.Top;
-                    int cx = screens[index].Bounds.Right;
-                    int cy = screens[index].Bounds.Height;
-                    Form2 form2 = new Form2(imageName);
-                    form2.Size = new Size(cx, cy);
-                    SetWindowPos(form2.Handle, 0, x, y, cx, cy, SWP_NOZORDER | SWP_NOSIZE | SWP_SHOWWINDOW);
-                    form2.TopMost = true;
-=======
->>>>>>> cc97056c14c9b73d9727285e345c8715208425eb
-
-
-                    if (index >= 1)
+                    if (index !=2)
                     {
                         int x = screens[index].Bounds.Left;
                         int y = screens[index].Bounds.Top;
@@ -104,31 +73,26 @@ namespace WindowsFormsApplication1
                         form2.TopMost = true;
 
                         form2.FormBorderStyle = FormBorderStyle.None;
-
-
                         form2.WindowState = FormWindowState.Maximized;
                         form2.Show();
                         forms.Add(form2);
                     }
 
-                }
-                this.panel3.Invalidate();
-                this.panel2.Invalidate();
-                foreach (RadioButton radio in this.groupBoxOption.Controls.OfType<RadioButton>().ToList())
-                {
-                    radio.CheckedChanged += radioCheckedChanged;
-                }
+                    this.panel3.Invalidate();
+                    this.panel2.Invalidate();
+                    foreach (RadioButton radio in this.groupBoxOption.Controls.OfType<RadioButton>().ToList())
+                    {
+                        radio.CheckedChanged += radioCheckedChanged;
+                    }
 
-                this.textXangle.KeyUp += textXangle_KeyUp;
-                this.calibrationImage = (Bitmap)Bitmap.FromFile(tiltImageName);
-                this.checkBoxCalibration.CheckedChanged += checkBoxCalibration_CheckedChanged;
+                    this.textXangle.KeyUp += textXangle_KeyUp;
+                    this.calibrationImage = (Bitmap)Bitmap.FromFile(tiltImageName);
+                    this.checkBoxCalibration.CheckedChanged += checkBoxCalibration_CheckedChanged;
+                }
             }
             catch (Exception ex)
             {
-                System.IO.StreamWriter file = new System.IO.StreamWriter("c:\\errorLog.txt");
-                file.WriteLine(ex.InnerException);
 
-                file.Close();
             }
         }
         public static Bitmap resizeImage(Bitmap imgToResize, Size size)
@@ -198,9 +162,11 @@ namespace WindowsFormsApplication1
                 {
                     case "radioFourierTilt":
                         this.panelImage.Visible = false;
+                        this.panelTilt.Visible = true;
                         break;
                     case "radioRawImage":
                         this.panelImage.Visible = true;
+                        this.panelTilt.Visible = false;
                         foreach (Form2 form in forms)
                         {
                             form.showFourierImage = false;
@@ -209,6 +175,7 @@ namespace WindowsFormsApplication1
                         break;
                     case "radioFourierImage":
                         this.panelImage.Visible = true;
+                        this.panelTilt.Visible = false;
                         foreach (Form2 form in forms)
                         {
                             form.showFourierImage = true;
@@ -320,7 +287,27 @@ namespace WindowsFormsApplication1
             }
             
         }
-        
+        private void toggleDisplayImage_CheckedChanged(object sender, EventArgs e)
+        {
+            if (this.toggleDisplayImage.Checked)
+            {
+                this.toggleDisplayImage.Text = "Original Image";
+                foreach (Form2 form in forms)
+                {
+                    form.showFourierImage = false;
+                    form.Invalidate();
+                }
+            }
+            else
+            {
+                this.toggleDisplayImage.Text = "Fourier Image";
+                foreach (Form2 form in forms)
+                {
+                    form.showFourierImage = true;
+                    form.Invalidate();
+                }
+            }
+        }
 
     }
 
