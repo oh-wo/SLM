@@ -58,7 +58,7 @@ namespace WindowsFormsApplication1
                     listBox1.Items.Add("Type: " + screens[index].GetType().ToString());
                     listBox1.Items.Add("Working Area: " + screens[index].WorkingArea.ToString());
                     listBox1.Items.Add("Primary Screen: " + screens[index].Primary.ToString());
-                    listBox1.Items.Add(""); listBox1.Items.Add(""); listBox1.Items.Add("");
+                    listBox1.Items.Add("\n\n\n");
 
 
                     if (index !=2)
