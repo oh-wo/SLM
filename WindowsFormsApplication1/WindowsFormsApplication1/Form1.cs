@@ -61,7 +61,7 @@ namespace WindowsFormsApplication1
                     listBox1.Items.Add("\n\n\n");
 
 
-                    if (index !=2)
+                    if (!screens[index].Primary)
                     {
                         int x = screens[index].Bounds.Left;
                         int y = screens[index].Bounds.Top;
@@ -199,6 +199,8 @@ namespace WindowsFormsApplication1
             int _height = this.panelTiltImage.Height;
             tiltImage = new Bitmap(_width,_height);
 
+            //prepare for parse
+            this.textXangle.Text=this.textXangle.Text == "" ? (0).ToString() : this.textXangle.Text;
             double thetaXD = double.Parse(this.textXangle.Text);
             double thetaX = Math.PI/180*thetaXD;
 
