@@ -25,13 +25,15 @@ namespace WindowsFormsApplication1
         const short SWP_NOSIZE = 1;
         const short SWP_NOZORDER = 0X4;
         const int SWP_SHOWWINDOW = 0x0040;
-        public static string imageName = "fresnelLens.gif";
+        public static string imageName = "test.bmp";
 
         public List<Form> forms = new List<Form>();
 
         Bitmap originalImage;
         Bitmap img8bit;
         Bitmap fourierImage;
+
+        int imageToShow = 0;//0=tilt, 1=fourier, 2=raw
 
         public Form1()
         {
@@ -61,7 +63,7 @@ namespace WindowsFormsApplication1
                     listBox1.Items.Add("\n\n\n");
 
 
-                    if (index !=2)
+                    if (!screens[index].Primary)
                     {
                         int x = screens[index].Bounds.Left;
                         int y = screens[index].Bounds.Top;
@@ -163,25 +165,25 @@ namespace WindowsFormsApplication1
                     case "radioFourierTilt":
                         this.panelImage.Visible = false;
                         this.panelTilt.Visible = true;
+                        imageToShow = 0;
                         break;
                     case "radioRawImage":
                         this.panelImage.Visible = true;
                         this.panelTilt.Visible = false;
-                        foreach (Form2 form in forms)
-                        {
-                            form.showFourierImage = false;
-                            form.Invalidate();
-                        }
+                        imageToShow = 1;
                         break;
                     case "radioFourierImage":
                         this.panelImage.Visible = true;
                         this.panelTilt.Visible = false;
-                        foreach (Form2 form in forms)
-                        {
-                            form.showFourierImage = true;
-                            form.Invalidate();
-                        }
+                        imageToShow = 2;
                         break;
+                }
+
+                foreach (Form2 form in forms)
+                {
+                    form.imageToShow = imageToShow;
+                    form.tiltImage = tiltImage;
+                    form.Invalidate();
                 }
             }
            
@@ -199,9 +201,9 @@ namespace WindowsFormsApplication1
             int _height = this.panelTiltImage.Height;
             tiltImage = new Bitmap(_width,_height);
 
-            double thetaXD = double.Parse(this.textXangle.Text);
+            double thetaXD = double.Parse(this.textXangle.Text==""?"0":this.textXangle.Text);
             double thetaX = Math.PI/180*thetaXD;
-
+            double maxTheta = 2 * Math.PI / (800 * Math.Pow(10, -9)) * Math.Sin(Math.PI / 2) * Math.Max(_width, _height);
             double[,] x = new double[_width, _height];
             double[,] y = new double[_width, _height];
             int color;
@@ -223,7 +225,7 @@ namespace WindowsFormsApplication1
             {
                 for (int j = 0; j < _width; j++)
                 {
-                    xi[j, i] = int.Parse(Math.Round(x[j, i] / max * 255).ToString());
+                    xi[j, i] = int.Parse((Math.Round((x[j, i] + maxTheta) / (2 * maxTheta) * 255)).ToString());
                     if (this.checkBoxCalibration.Checked)
                     {
                       // xi[j, i] += calibrationImage.GetPixel(j, i).A;
@@ -250,6 +252,13 @@ namespace WindowsFormsApplication1
                 g.DrawImage(tiltImage, new Rectangle(new Point(0, 0), new Size(this.panelTiltImage.Width, this.panelTiltImage.Height)));
 
                 g.Dispose();
+
+                foreach (Form2 form in forms)
+                {
+                    form.imageToShow = imageToShow;
+                    form.tiltImage = tiltImage;
+                    form.Invalidate();
+                }
             }
             catch (Exception ex)
             {
@@ -286,27 +295,6 @@ namespace WindowsFormsApplication1
 
             }
             
-        }
-        private void toggleDisplayImage_CheckedChanged(object sender, EventArgs e)
-        {
-            if (this.toggleDisplayImage.Checked)
-            {
-                this.toggleDisplayImage.Text = "Original Image";
-                foreach (Form2 form in forms)
-                {
-                    form.showFourierImage = false;
-                    form.Invalidate();
-                }
-            }
-            else
-            {
-                this.toggleDisplayImage.Text = "Fourier Image";
-                foreach (Form2 form in forms)
-                {
-                    form.showFourierImage = true;
-                    form.Invalidate();
-                }
-            }
         }
 
     }

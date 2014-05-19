@@ -14,14 +14,13 @@ namespace WindowsFormsApplication1
     public partial class Form2 : Form
     {
        public string _imageName;
-       public  bool showFourierImage = false;
+       public int imageToShow = 0;
+       public Bitmap tiltImage;
         public Form2(string imageName)
         {
             _imageName = imageName;
             InitializeComponent();
             this.Paint+=Form2_Paint;
-
-            showFourierImage = true;
         }
 
         private void Form2_Paint(object sender, PaintEventArgs e)
@@ -54,13 +53,20 @@ namespace WindowsFormsApplication1
                         complexImage.ForwardFourierTransform();
                         // get complex image as bitmat
                         Bitmap fourierImage = complexImage.ToBitmap();
-                        if (showFourierImage)
+                        switch (imageToShow)
                         {
-                            g.DrawImage(fourierImage, 0, 0, this.Width, this.Height);
-                        }
-                        else
-                        {
-                            g.DrawImage(originalImage, 0, 0, this.Width, this.Height);
+                            case 0:
+                                if (tiltImage != null)
+                                {
+                                    g.DrawImage(tiltImage, 0, 0, this.Width, this.Height);
+                                }
+                                break;
+                            case 1:
+                                g.DrawImage(originalImage, 0, 0, this.Width, this.Height);
+                                break;
+                            case 2:
+                                g.DrawImage(fourierImage, 0, 0, this.Width, this.Height);
+                                break;
                         }
                     }
                 }
