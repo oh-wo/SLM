@@ -201,13 +201,9 @@ namespace WindowsFormsApplication1
             int _height = this.panelTiltImage.Height;
             tiltImage = new Bitmap(_width,_height);
 
-<<<<<<< HEAD
-            double thetaXD = double.Parse(this.textXangle.Text==""?"0":this.textXangle.Text);
-=======
             //prepare for parse
             this.textXangle.Text=this.textXangle.Text == "" ? (0).ToString() : this.textXangle.Text;
             double thetaXD = double.Parse(this.textXangle.Text);
->>>>>>> 863e146aa8db99a4c944af2dc5426da9eb3d845a
             double thetaX = Math.PI/180*thetaXD;
             double maxTheta = 2 * Math.PI / (800 * Math.Pow(10, -9)) * Math.Sin(Math.PI / 2) * Math.Max(_width, _height);
             double[,] x = new double[_width, _height];
