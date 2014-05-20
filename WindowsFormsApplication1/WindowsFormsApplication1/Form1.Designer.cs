@@ -35,23 +35,23 @@
             this.radioRawImage = new System.Windows.Forms.RadioButton();
             this.radioFourierImage = new System.Windows.Forms.RadioButton();
             this.panelImage = new System.Windows.Forms.Panel();
-            this.panelTilt = new System.Windows.Forms.Panel();
-            this.panelTiltImage = new System.Windows.Forms.Panel();
-            this.trackBarXAngle = new System.Windows.Forms.TrackBar();
-            this.textXangle = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
             this.labelSelectedImage = new System.Windows.Forms.Label();
             this.buttonOpenImage = new System.Windows.Forms.Button();
+            this.panelTilt = new System.Windows.Forms.Panel();
+            this.textYangle = new System.Windows.Forms.TextBox();
             this.trackBar1 = new System.Windows.Forms.TrackBar();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.panelTiltImage = new System.Windows.Forms.Panel();
+            this.trackBarXAngle = new System.Windows.Forms.TrackBar();
+            this.textXangle = new System.Windows.Forms.TextBox();
             this.groupBoxOption.SuspendLayout();
             this.panelImage.SuspendLayout();
             this.panelTilt.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBarXAngle)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarXAngle)).BeginInit();
             this.SuspendLayout();
             // 
             // listBox1
@@ -98,6 +98,7 @@
             this.radioFourierTilt.TabStop = true;
             this.radioFourierTilt.Text = "Fourier tilt";
             this.radioFourierTilt.UseVisualStyleBackColor = true;
+            this.radioFourierTilt.CheckedChanged += new System.EventHandler(this.radioFourierTilt_CheckedChanged);
             // 
             // radioRawImage
             // 
@@ -132,42 +133,6 @@
             this.panelImage.Size = new System.Drawing.Size(713, 446);
             this.panelImage.TabIndex = 13;
             this.panelImage.Visible = false;
-            // 
-            // panelTilt
-            // 
-            this.panelTilt.Controls.Add(this.textBox1);
-            this.panelTilt.Controls.Add(this.trackBar1);
-            this.panelTilt.Controls.Add(this.panelTiltImage);
-            this.panelTilt.Controls.Add(this.trackBarXAngle);
-            this.panelTilt.Controls.Add(this.textXangle);
-            this.panelTilt.Location = new System.Drawing.Point(476, 16);
-            this.panelTilt.Name = "panelTilt";
-            this.panelTilt.Size = new System.Drawing.Size(710, 446);
-            this.panelTilt.TabIndex = 14;
-            // 
-            // panelTiltImage
-            // 
-            this.panelTiltImage.Location = new System.Drawing.Point(151, 32);
-            this.panelTiltImage.Name = "panelTiltImage";
-            this.panelTiltImage.Size = new System.Drawing.Size(449, 370);
-            this.panelTiltImage.TabIndex = 2;
-            // 
-            // trackBarXAngle
-            // 
-            this.trackBarXAngle.Location = new System.Drawing.Point(0, 133);
-            this.trackBarXAngle.Maximum = 1;
-            this.trackBarXAngle.Minimum = -1;
-            this.trackBarXAngle.Name = "trackBarXAngle";
-            this.trackBarXAngle.Size = new System.Drawing.Size(104, 45);
-            this.trackBarXAngle.TabIndex = 1;
-            // 
-            // textXangle
-            // 
-            this.textXangle.Location = new System.Drawing.Point(9, 62);
-            this.textXangle.Name = "textXangle";
-            this.textXangle.Size = new System.Drawing.Size(47, 20);
-            this.textXangle.TabIndex = 0;
-            this.textXangle.Text = "0.05";
             // 
             // label2
             // 
@@ -220,6 +185,26 @@
             this.buttonOpenImage.UseVisualStyleBackColor = true;
             this.buttonOpenImage.Click += new System.EventHandler(this.buttonOpenImage_Click);
             // 
+            // panelTilt
+            // 
+            this.panelTilt.Controls.Add(this.textYangle);
+            this.panelTilt.Controls.Add(this.trackBar1);
+            this.panelTilt.Controls.Add(this.panelTiltImage);
+            this.panelTilt.Controls.Add(this.trackBarXAngle);
+            this.panelTilt.Controls.Add(this.textXangle);
+            this.panelTilt.Location = new System.Drawing.Point(476, 16);
+            this.panelTilt.Name = "panelTilt";
+            this.panelTilt.Size = new System.Drawing.Size(710, 446);
+            this.panelTilt.TabIndex = 14;
+            // 
+            // textYangle
+            // 
+            this.textYangle.Location = new System.Drawing.Point(101, 62);
+            this.textYangle.Name = "textYangle";
+            this.textYangle.Size = new System.Drawing.Size(44, 20);
+            this.textYangle.TabIndex = 4;
+            this.textYangle.Text = "0.05";
+            // 
             // trackBar1
             // 
             this.trackBar1.Location = new System.Drawing.Point(110, 112);
@@ -230,13 +215,29 @@
             this.trackBar1.Size = new System.Drawing.Size(45, 104);
             this.trackBar1.TabIndex = 3;
             // 
-            // textBox1
+            // panelTiltImage
             // 
-            this.textBox1.Location = new System.Drawing.Point(101, 62);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(44, 20);
-            this.textBox1.TabIndex = 4;
-            this.textBox1.Text = "0";
+            this.panelTiltImage.Location = new System.Drawing.Point(151, 32);
+            this.panelTiltImage.Name = "panelTiltImage";
+            this.panelTiltImage.Size = new System.Drawing.Size(449, 370);
+            this.panelTiltImage.TabIndex = 2;
+            // 
+            // trackBarXAngle
+            // 
+            this.trackBarXAngle.Location = new System.Drawing.Point(0, 133);
+            this.trackBarXAngle.Maximum = 1;
+            this.trackBarXAngle.Minimum = -1;
+            this.trackBarXAngle.Name = "trackBarXAngle";
+            this.trackBarXAngle.Size = new System.Drawing.Size(104, 45);
+            this.trackBarXAngle.TabIndex = 1;
+            // 
+            // textXangle
+            // 
+            this.textXangle.Location = new System.Drawing.Point(9, 62);
+            this.textXangle.Name = "textXangle";
+            this.textXangle.Size = new System.Drawing.Size(47, 20);
+            this.textXangle.TabIndex = 0;
+            this.textXangle.Text = "0.05";
             // 
             // Form1
             // 
@@ -256,8 +257,8 @@
             this.panelImage.PerformLayout();
             this.panelTilt.ResumeLayout(false);
             this.panelTilt.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.trackBarXAngle)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.trackBarXAngle)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -281,7 +282,7 @@
         private System.Windows.Forms.TextBox textXangle;
         private System.Windows.Forms.Panel panelTiltImage;
         private System.Windows.Forms.CheckBox checkBoxCalibration;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox textYangle;
         private System.Windows.Forms.TrackBar trackBar1;
 
     }

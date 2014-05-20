@@ -19,7 +19,6 @@ namespace WindowsFormsApplication1
         [DllImport("user32.dll", EntryPoint = "SetWindowPos")]
         public static extern IntPtr SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int Y, int cx, int cy, int wFlags);
 
-
         //Form form2 = new WindowsFormsApplication1.Form2();
 
         const short SWP_NOMOVE = 0X2;
@@ -38,6 +37,8 @@ namespace WindowsFormsApplication1
 
         public Form1()
         {
+
+
             try
             {
                 InitializeComponent();
@@ -89,7 +90,15 @@ namespace WindowsFormsApplication1
                     }
 
                     this.textXangle.KeyUp += textXangle_KeyUp;
-                    this.calibrationImage = (Bitmap)Bitmap.FromFile(tiltImageName);
+                    this.textYangle.KeyUp += textYangle_KeyUp;
+                    try
+                    {
+                        this.calibrationImage = (Bitmap)Bitmap.FromFile(tiltImageName);
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
                     this.checkBoxCalibration.CheckedChanged += checkBoxCalibration_CheckedChanged;
 
                 }
@@ -203,6 +212,17 @@ namespace WindowsFormsApplication1
                 }
             }
         }
+        private void textYangle_KeyUp(object Sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                if (decimal.TryParse(this.textYangle.Text, out yAngle))
+                {
+                    Thread x = new Thread(() => makeTiltImage());
+                    x.Start();
+                }
+            }
+        }
         /*
             int _width = this.panelTiltImage.Width;
             int _height = this.panelTiltImage.Height;
@@ -244,7 +264,7 @@ namespace WindowsFormsApplication1
             */
 
         decimal xAngle = (decimal)0.05;
-
+        decimal yAngle = (decimal)0.05;
         private void makeTiltImage()
         {
             bool besQ = false;
@@ -254,7 +274,7 @@ namespace WindowsFormsApplication1
             int vortexCharge = 0;
 
            
-            decimal yAngle = (decimal)0;
+            
 
             /////////////////////////////////////////////Define physical parameters
 
@@ -275,7 +295,7 @@ namespace WindowsFormsApplication1
             //Specify the number of levels each pixel can have
             decimal clev = 256;
             //Set the phase in which the mask will act over.
-            decimal phaselimit = (decimal)2 * (decimal)Math.PI;
+            decimal phaselimit = (decimal)(6.283185307179586);
             //Rotation of the mask (radians)
             decimal ellprot = 0; 
 
@@ -305,7 +325,6 @@ namespace WindowsFormsApplication1
             
             //Transforing to polar co-ordinates
             CartToPol cartToPol = new CartToPol(xx,yy);
-
             decimal[,] Phi = new Zeros(resx, resy).Mat;
 
             ///////////////////////////////////////Calculating Bessel Hologram
@@ -330,21 +349,17 @@ namespace WindowsFormsApplication1
             ///////////////////////////////////////////Calculating Stering Hologram
 
             //Calculating Hologram
-            WriteMatrixToCsv(Phi,"Phi01.csv");
-            Phi = new MatrixAdd(new MatrixAdd(Phi, (2 * (decimal)Math.PI / wavelength) * (decimal)Math.Sin(Math.PI / (double)180 * (double)yAngle)).Mat, xx).Mat;
-            WriteMatrixToCsv(Phi, "Phi02.csv");
-            Phi = new MatrixAdd(new MatrixAdd(Phi, (2 * (decimal)Math.PI / wavelength) * (decimal)Math.Sin(Math.PI / (double)180 * (double)xAngle)).Mat, yy).Mat;
-            WriteMatrixToCsv(Phi, "Phi03.csv");
+            Phi = new MatrixAdd(Phi,new MatrixMultiply(xx,(2 * (decimal)Math.PI / wavelength) * (decimal)Math.Sin(Math.PI / (double)180 * (double)yAngle)).Mat).Mat;
+            Phi = new MatrixAdd(Phi, new MatrixMultiply(yy, (2 * (decimal)Math.PI / wavelength) * (decimal)Math.Sin(Math.PI / (double)180 * (double)xAngle)).Mat).Mat;
             Phi = new MatrixMod(Phi, phaselimit).Mat;
-
-            WriteMatrixToCsv(yy, "yy01.csv");
-            WriteMatrixToCsv(Phi, "Phi04.csv");
+            
 
             //draw in c#
             Bitmap tempTiltImage = new Bitmap(resx, resy);
 
             decimal[,]  mask = new MatrixMultiply(Phi, 254 / (decimal)(Phi.Cast<decimal>().Max())).Mat;
-
+            mask = Round(Transpose(mask));
+           // WriteMatrixToCsv(mask, "mask.csv");
             for (int i = 0; i < (resy-1); i++)
             {
                 for (int j = 0; j < (resx - 1); j++)
@@ -354,7 +369,7 @@ namespace WindowsFormsApplication1
                 }
             }
             tiltImage = tempTiltImage;
-            tiltImage.Save("testtest56.bmp");
+           // tiltImage.Save("testtest56.bmp");
 
             this.panelTiltImage.Invalidate();
         }
@@ -388,6 +403,36 @@ namespace WindowsFormsApplication1
         Bitmap tiltImage;
         string tiltImageName = "LSH0600812_850nm_calibration.bmp";
 
+        public decimal[,] Round(decimal[,] mat)
+        {
+            int xDim = mat.GetUpperBound(0) + 1;
+            int yDim = mat.GetUpperBound(1) + 1;
+            decimal[,] Mat = new decimal[xDim, yDim];
+            for (int i = 0; i < (xDim-1); i++)
+            {
+                for (int j = 0; j < (yDim-1); j++)
+                {
+                    Mat[i,j] = Math.Round(mat[i,j]);
+                }
+            }
+            return Mat;
+        } 
+
+        public decimal[,] Transpose(decimal[,] mat)
+        {
+            int xDim = mat.GetUpperBound(0) + 1;
+            int yDim = mat.GetUpperBound(1) + 1;
+            decimal[,] Mat = new decimal[yDim,xDim];
+            for (int i = 0; i < xDim; i++)
+            {
+                for (int j = 0; j < yDim; j++)
+                {
+                    Mat[j,i] = mat[i,j];
+                }
+            }
+            return Mat;
+        }
+
         public class MeshGrid
         {
             public MeshGrid(decimal xL, decimal xS, decimal xU, decimal yL, decimal yS, decimal yU)
@@ -399,15 +444,15 @@ namespace WindowsFormsApplication1
                 int height = int.Parse(Math.Ceiling((yU - yL) / yS).ToString());
 
 
-                X = new decimal[width, height];
-                Y = new decimal[width, height];
+                X = new decimal[height, width];
+                Y = new decimal[height, width];
                 
                 for (int j = 0; j < height; j++)
                 {
                     for (int i = 0; i < width; i++)
                     {
-                        X[i, j] = xL + xS * (decimal)i;
-                        Y[i, j] = yL + yS * (decimal)j;
+                        X[j, i] = xL + xS * (decimal)i;
+                        Y[j, i] = yL + yS * (decimal)j;
                     }
                 }
 
@@ -495,7 +540,7 @@ namespace WindowsFormsApplication1
                 {
                     for (int j = 0; j < (yDim-1); j++)
                     {
-                        Theta[i, j] = (decimal)Math.Atan((double)(yMat[i, j]/xMat[i, j]));
+                        Theta[i, j] = (decimal)Math.Atan2((double)yMat[i, j], (double)xMat[i, j]);
                         Rho[i, j] = (decimal)Math.Sqrt(Math.Pow((double)xMat[i, j], 2) + Math.Pow((double)yMat[i, j], 2));
                     }
                 }
@@ -516,23 +561,28 @@ namespace WindowsFormsApplication1
                 {
                     for (int j = 0; j < yDim; j++)
                     {
-                        Mat[i, j] = mat1[i, j] % scalar;
+                        Mat[i, j] = MatlabMod(mat1[i, j], scalar);
                     }
                 }
             }
             public decimal[,] Mat { get; set; }
+
+            public decimal MatlabMod(decimal dividend, decimal divisor)
+            {
+                return dividend - Math.Floor(dividend / divisor) * divisor;
+            }
         }
         public class Zeros
         {
             //Modulus after division
             public Zeros(int x, int y)
             {
-                Mat = new decimal[x, y];
+                Mat = new decimal[y,x];
                 for (int i = 0; i < x; i++)
                 {
                     for (int j = 0; j < y; j++)
                     {
-                        Mat[i, j] = 0;
+                        Mat[j,i] = 0;
                     }
                 }
             }
@@ -591,6 +641,11 @@ namespace WindowsFormsApplication1
 
             }
             
+        }
+
+        private void radioFourierTilt_CheckedChanged(object sender, EventArgs e)
+        {
+            imageToShow = 0;
         }
 
     }

@@ -29,54 +29,52 @@ namespace WindowsFormsApplication1
         }
         private void DrawStuff(Graphics g)
         {
-
-            try
+            if (imageToShow != 0)
             {
-                /*IMAGES
 
-                 * batman-logo.gif
-                 * halfhalf.png
-                 * 
-                 * */
-                Bitmap originalImage = (Bitmap)Bitmap.FromFile(_imageName);
-                int newHeight = int.Parse(Math.Pow(2, Math.Ceiling(Math.Log(originalImage.Height) / Math.Log(2))).ToString());
-                originalImage = Form1.resizeImage(originalImage, new System.Drawing.Size(newHeight, newHeight));
-                // create complex image
-                Bitmap img8bit = BM.CopyToBpp(originalImage, 8);
-               // g.DrawImage(img8bit, new Point(0, 0));
-                using (Bitmap large = new Bitmap(512, 512, g))
+                try
                 {
-                    using (Graphics largeGraphics = Graphics.FromImage(large))
+                    Bitmap originalImage = (Bitmap)Bitmap.FromFile(_imageName);
+                    int newHeight = int.Parse(Math.Pow(2, Math.Ceiling(Math.Log(originalImage.Height) / Math.Log(2))).ToString());
+                    originalImage = Form1.resizeImage(originalImage, new System.Drawing.Size(newHeight, newHeight));
+                    // create complex image
+                    Bitmap img8bit = BM.CopyToBpp(originalImage, 8);
+                    // g.DrawImage(img8bit, new Point(0, 0));
+                    using (Bitmap large = new Bitmap(512, 512, g))
                     {
-                        ComplexImage complexImage = ComplexImage.FromBitmap(img8bit);
-                        // do forward Fourier transformation
-                        complexImage.ForwardFourierTransform();
-                        // get complex image as bitmat
-                        Bitmap fourierImage = complexImage.ToBitmap();
-                        switch (imageToShow)
+                        using (Graphics largeGraphics = Graphics.FromImage(large))
                         {
-                            case 0:
-                                if (tiltImage != null)
-                                {
-                                    g.DrawImage(tiltImage, 0, 0, this.Width, this.Height);
-                                }
-                                break;
-                            case 1:
-                                g.DrawImage(originalImage, 0, 0, this.Width, this.Height);
-                                break;
-                            case 2:
-                                g.DrawImage(fourierImage, 0, 0, this.Width, this.Height);
-                                break;
+                            ComplexImage complexImage = ComplexImage.FromBitmap(img8bit);
+                            // do forward Fourier transformation
+                            complexImage.ForwardFourierTransform();
+                            // get complex image as bitmat
+                            Bitmap fourierImage = complexImage.ToBitmap();
                         }
                     }
+                    switch (imageToShow)
+                    {
+                        case 0:
+
+                            break;
+                        case 1:
+                            g.DrawImage(originalImage, 0, 0, this.Width, this.Height);
+                            break;
+                        case 2:
+                            // g.DrawImage(fourierImage, 0, 0, this.Width, this.Height);
+                            break;
+                    }
+
                 }
+                catch (Exception ex)
+                {
 
-                g.Dispose();
+                }
             }
-            catch (Exception ex)
+            if (imageToShow == 0 && tiltImage != null)
             {
-
+                g.DrawImage(tiltImage, 0, 0, this.Width, this.Height);
             }
+            g.Dispose();
         }
     }
 }
