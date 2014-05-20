@@ -265,10 +265,10 @@ namespace WindowsFormsApplication1
 
         decimal xAngle = (decimal)0.05;
         decimal yAngle = (decimal)0.05;
+        bool besQ = false;
+        int besOrder = 2;
         private void makeTiltImage()
         {
-            bool besQ = false;
-            int order = 2;
             decimal axiconAngle = (decimal)0.3;//degrees
 
             int vortexCharge = 0;
@@ -331,7 +331,7 @@ namespace WindowsFormsApplication1
             if (besQ && vortexCharge == 0)
             {
                 //Calculating hologram
-                Phi = new MatrixMultiply(cartToPol.Theta, (decimal)order).Mat;
+                Phi = new MatrixMultiply(cartToPol.Theta, (decimal)besOrder).Mat;
                 Phi = new MatrixAdd(Phi, -Phi.Cast<decimal>().Min()).Mat;
                 Phi = new MatrixAdd(Phi, new MatrixMultiply(cartToPol.Rho, kr).Mat).Mat;
                 Phi = new MatrixAdd(Phi, new MatrixMultiply(new MatrixExponential(cartToPol.Rho, 2).Mat, beta).Mat).Mat;
@@ -613,7 +613,9 @@ namespace WindowsFormsApplication1
 
         private void checkBoxCalibration_CheckedChanged(object sender, EventArgs e)
         {
-            makeTiltImage();
+            Thread x = new Thread(() => makeTiltImage());
+            x.Start();
+
         }
 
         private void buttonOpenImage_Click(object sender, EventArgs e)
@@ -646,6 +648,34 @@ namespace WindowsFormsApplication1
         private void radioFourierTilt_CheckedChanged(object sender, EventArgs e)
         {
             imageToShow = 0;
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            besQ = this.checkBoxBessel.Checked;
+            Thread x = new Thread(() => makeTiltImage());
+            x.Start();
+            if (besQ)
+            {
+                numericUpDown1.Enabled = true;
+            }
+            else
+            {
+                numericUpDown1.Enabled = false;
+            }
+        }
+
+        private void numericUpDown1_ValueChanged(object sender, EventArgs e)
+        {
+            if (int.TryParse(this.numericUpDown1.Value.ToString(), out besOrder))
+            {
+                Thread x = new Thread(() => makeTiltImage());
+                x.Start();
+            }
+            else
+            {
+                this.numericUpDown1.Value = besOrder;
+            }
         }
 
     }

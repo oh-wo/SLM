@@ -47,11 +47,15 @@
             this.panelTiltImage = new System.Windows.Forms.Panel();
             this.trackBarXAngle = new System.Windows.Forms.TrackBar();
             this.textXangle = new System.Windows.Forms.TextBox();
+            this.checkBoxBessel = new System.Windows.Forms.CheckBox();
+            this.numericUpDown1 = new System.Windows.Forms.NumericUpDown();
+            this.label3 = new System.Windows.Forms.Label();
             this.groupBoxOption.SuspendLayout();
             this.panelImage.SuspendLayout();
             this.panelTilt.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarXAngle)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
             this.SuspendLayout();
             // 
             // listBox1
@@ -187,6 +191,9 @@
             // 
             // panelTilt
             // 
+            this.panelTilt.Controls.Add(this.label3);
+            this.panelTilt.Controls.Add(this.numericUpDown1);
+            this.panelTilt.Controls.Add(this.checkBoxBessel);
             this.panelTilt.Controls.Add(this.textYangle);
             this.panelTilt.Controls.Add(this.trackBar1);
             this.panelTilt.Controls.Add(this.panelTiltImage);
@@ -199,7 +206,7 @@
             // 
             // textYangle
             // 
-            this.textYangle.Location = new System.Drawing.Point(101, 62);
+            this.textYangle.Location = new System.Drawing.Point(105, 125);
             this.textYangle.Name = "textYangle";
             this.textYangle.Size = new System.Drawing.Size(44, 20);
             this.textYangle.TabIndex = 4;
@@ -207,7 +214,7 @@
             // 
             // trackBar1
             // 
-            this.trackBar1.Location = new System.Drawing.Point(110, 112);
+            this.trackBar1.Location = new System.Drawing.Point(114, 175);
             this.trackBar1.Maximum = 1;
             this.trackBar1.Minimum = -1;
             this.trackBar1.Name = "trackBar1";
@@ -224,7 +231,7 @@
             // 
             // trackBarXAngle
             // 
-            this.trackBarXAngle.Location = new System.Drawing.Point(0, 133);
+            this.trackBarXAngle.Location = new System.Drawing.Point(4, 196);
             this.trackBarXAngle.Maximum = 1;
             this.trackBarXAngle.Minimum = -1;
             this.trackBarXAngle.Name = "trackBarXAngle";
@@ -233,11 +240,40 @@
             // 
             // textXangle
             // 
-            this.textXangle.Location = new System.Drawing.Point(9, 62);
+            this.textXangle.Location = new System.Drawing.Point(13, 125);
             this.textXangle.Name = "textXangle";
             this.textXangle.Size = new System.Drawing.Size(47, 20);
             this.textXangle.TabIndex = 0;
             this.textXangle.Text = "0.05";
+            // 
+            // checkBoxBessel
+            // 
+            this.checkBoxBessel.AutoSize = true;
+            this.checkBoxBessel.Location = new System.Drawing.Point(13, 24);
+            this.checkBoxBessel.Name = "checkBoxBessel";
+            this.checkBoxBessel.Size = new System.Drawing.Size(57, 17);
+            this.checkBoxBessel.TabIndex = 5;
+            this.checkBoxBessel.Text = "Bessel";
+            this.checkBoxBessel.UseVisualStyleBackColor = true;
+            this.checkBoxBessel.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            // 
+            // numericUpDown1
+            // 
+            this.numericUpDown1.Enabled = false;
+            this.numericUpDown1.Location = new System.Drawing.Point(53, 42);
+            this.numericUpDown1.Name = "numericUpDown1";
+            this.numericUpDown1.Size = new System.Drawing.Size(57, 20);
+            this.numericUpDown1.TabIndex = 6;
+            this.numericUpDown1.ValueChanged += new System.EventHandler(this.numericUpDown1_ValueChanged);
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(10, 44);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(33, 13);
+            this.label3.TabIndex = 7;
+            this.label3.Text = "Order";
             // 
             // Form1
             // 
@@ -259,6 +295,7 @@
             this.panelTilt.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.trackBarXAngle)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -284,6 +321,9 @@
         private System.Windows.Forms.CheckBox checkBoxCalibration;
         private System.Windows.Forms.TextBox textYangle;
         private System.Windows.Forms.TrackBar trackBar1;
+        private System.Windows.Forms.CheckBox checkBoxBessel;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.NumericUpDown numericUpDown1;
 
     }
 }
