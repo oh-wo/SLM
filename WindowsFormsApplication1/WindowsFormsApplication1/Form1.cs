@@ -9,7 +9,8 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using AForge.Imaging;
-
+using System.Threading;
+using System.IO;
 
 namespace WindowsFormsApplication1
 {
@@ -90,12 +91,16 @@ namespace WindowsFormsApplication1
                     this.textXangle.KeyUp += textXangle_KeyUp;
                     this.calibrationImage = (Bitmap)Bitmap.FromFile(tiltImageName);
                     this.checkBoxCalibration.CheckedChanged += checkBoxCalibration_CheckedChanged;
+
                 }
+
             }
             catch (Exception ex)
             {
 
             }
+
+            makeTiltImage();
         }
         public static Bitmap resizeImage(Bitmap imgToResize, Size size)
         {
@@ -192,22 +197,17 @@ namespace WindowsFormsApplication1
         {
             if (e.KeyCode == Keys.Enter)
             {
-                makeTiltImage();
+                if(decimal.TryParse(this.textXangle.Text,out xAngle)){
+                    Thread x = new Thread(() => makeTiltImage());
+                    x.Start();
+                }
             }
         }
-        private void makeTiltImage()
-        {
+        /*
             int _width = this.panelTiltImage.Width;
             int _height = this.panelTiltImage.Height;
             tiltImage = new Bitmap(_width,_height);
-
-<<<<<<< HEAD
             double thetaXD = double.Parse(this.textXangle.Text==""?"0":this.textXangle.Text);
-=======
-            //prepare for parse
-            this.textXangle.Text=this.textXangle.Text == "" ? (0).ToString() : this.textXangle.Text;
-            double thetaXD = double.Parse(this.textXangle.Text);
->>>>>>> 863e146aa8db99a4c944af2dc5426da9eb3d845a
             double thetaX = Math.PI/180*thetaXD;
             double maxTheta = 2 * Math.PI / (800 * Math.Pow(10, -9)) * Math.Sin(Math.PI / 2) * Math.Max(_width, _height);
             double[,] x = new double[_width, _height];
@@ -239,16 +239,305 @@ namespace WindowsFormsApplication1
                     tiltImage.SetPixel(j, i, Color.FromArgb(xi[j, i], xi[j, i], xi[j, i]));
                 }
             }
+            
+            tiltImage.Save("testtest56.bmp");
+            */
 
+        decimal xAngle = (decimal)0.05;
+
+        private void makeTiltImage()
+        {
+            bool besQ = false;
+            int order = 2;
+            decimal axiconAngle = (decimal)0.3;//degrees
+
+            int vortexCharge = 0;
+
+           
+            decimal yAngle = (decimal)0;
+
+            /////////////////////////////////////////////Define physical parameters
+
+            decimal wavelength = (decimal)(800 * Math.Pow(10, -9));
+            decimal refractiveIndex = (decimal)1.46;
+
+            //////////////////////////////////////////////Setting SLM parameters
+
+            //Specify the physical dimensions of the SLM face in metres
+            decimal Lx = (decimal)0.012;
+            decimal Ly = (decimal)0.016;
+            //Specify the number of pixels that are along each dimension
+            int resx = 600;
+            int resy = 792;
+            //Specify the scaling factor
+            decimal scalex = 1;
+            decimal scaley = 1;
+            //Specify the number of levels each pixel can have
+            decimal clev = 256;
+            //Set the phase in which the mask will act over.
+            decimal phaselimit = (decimal)2 * (decimal)Math.PI;
+            //Rotation of the mask (radians)
+            decimal ellprot = 0; 
+
+            //Not 100% sure what this does
+            decimal beta = 0; // lens factor [arb. unit]
+
+            /////////////////////////////////////////////Calculating other parameters
+
+            //Calculate dependent physical parameters
+            decimal coneangle = (refractiveIndex-1)*axiconAngle;
+            decimal angrad = (decimal)Math.PI/(decimal)180*coneangle;
+
+            decimal k = 2 * (decimal)Math.PI / wavelength;
+            decimal kz = (decimal)Math.Sqrt(Math.Pow((double)k, 2) / (1 + Math.Pow(Math.Tan((double)angrad), 2)));
+            decimal kr = (decimal)Math.Tan((double)angrad) * kz;
+
+            ///////////////////////////////////////////Setting up hologram mesh
+
+            //Calculating Spacing
+            decimal dLx = Lx/(resx-1);
+            decimal dLy = Ly/(resy-1);
+            //Setting up grid for hologram
+            MeshGrid mesh = new MeshGrid(-Lx/2,dLx,Lx/2,-Ly/2,dLy,Ly/2);
+            //Applying rotation
+            decimal[,] xx = (new MatrixAdd((new MatrixMultiply(mesh.X,(decimal)Math.Cos((double)ellprot))).Mat,(new MatrixMultiply(mesh.Y,(decimal)Math.Sin((double)ellprot))).Mat)).Mat;
+            decimal[,] yy = (new MatrixAdd((new MatrixMultiply(mesh.X,(decimal)(-Math.Sin((double)ellprot))).Mat),(new MatrixMultiply(mesh.Y,(decimal)Math.Cos((double)ellprot))).Mat)).Mat;
+            
+            //Transforing to polar co-ordinates
+            CartToPol cartToPol = new CartToPol(xx,yy);
+
+            decimal[,] Phi = new Zeros(resx, resy).Mat;
+
+            ///////////////////////////////////////Calculating Bessel Hologram
+            if (besQ && vortexCharge == 0)
+            {
+                //Calculating hologram
+                Phi = new MatrixMultiply(cartToPol.Theta, (decimal)order).Mat;
+                Phi = new MatrixAdd(Phi, -Phi.Cast<decimal>().Min()).Mat;
+                Phi = new MatrixAdd(Phi, new MatrixMultiply(cartToPol.Rho, kr).Mat).Mat;
+                Phi = new MatrixAdd(Phi, new MatrixMultiply(new MatrixExponential(cartToPol.Rho, 2).Mat, beta).Mat).Mat;
+            }
+            else
+            {
+                ///////////////////////////////////////Calculating Vortex Hologram
+                if (besQ)
+                {
+                    Phi=new MatrixAdd(Phi,(new MatrixMultiply(cartToPol.Theta,vortexCharge).Mat)).Mat;
+                    Phi=new MatrixMod(Phi,phaselimit).Mat;
+                }
+            }
+
+            ///////////////////////////////////////////Calculating Stering Hologram
+
+            //Calculating Hologram
+            WriteMatrixToCsv(Phi,"Phi01.csv");
+            Phi = new MatrixAdd(new MatrixAdd(Phi, (2 * (decimal)Math.PI / wavelength) * (decimal)Math.Sin(Math.PI / (double)180 * (double)yAngle)).Mat, xx).Mat;
+            WriteMatrixToCsv(Phi, "Phi02.csv");
+            Phi = new MatrixAdd(new MatrixAdd(Phi, (2 * (decimal)Math.PI / wavelength) * (decimal)Math.Sin(Math.PI / (double)180 * (double)xAngle)).Mat, yy).Mat;
+            WriteMatrixToCsv(Phi, "Phi03.csv");
+            Phi = new MatrixMod(Phi, phaselimit).Mat;
+
+            WriteMatrixToCsv(yy, "yy01.csv");
+            WriteMatrixToCsv(Phi, "Phi04.csv");
+
+            //draw in c#
+            Bitmap tempTiltImage = new Bitmap(resx, resy);
+
+            decimal[,]  mask = new MatrixMultiply(Phi, 254 / (decimal)(Phi.Cast<decimal>().Max())).Mat;
+
+            for (int i = 0; i < (resy-1); i++)
+            {
+                for (int j = 0; j < (resx - 1); j++)
+                {
+                    int color = int.Parse(Math.Ceiling(mask[j, i]).ToString());
+                    tempTiltImage.SetPixel(j, i, Color.FromArgb(color, color, color));
+                }
+            }
+            tiltImage = tempTiltImage;
             tiltImage.Save("testtest56.bmp");
 
             this.panelTiltImage.Invalidate();
         }
+
+
+        public void WriteMatrixToCsv(decimal[,] Mat,string filename)
+        {
+            if (!filename.EndsWith(".csv"))
+            {
+                filename += ".csv";
+            }
+            using (var w = new StreamWriter(String.Format("C:\\{0}",filename)))
+            {
+                int xDim = Mat.GetUpperBound(0) + 1;
+                int yDim = Mat.GetUpperBound(1) + 1;
+                for (int i = 0; i < (xDim - 1); i++)
+                {
+                    for (int j = 0; j < (yDim - 1); j++)
+                    {
+                        w.Write(string.Format("{0:0.00000000}, ", Mat[i, j]));
+                    }
+                    w.WriteLine("");
+                }
+
+                w.Flush();
+            }
+        }
+        
+
         Bitmap calibrationImage;
         Bitmap tiltImage;
         string tiltImageName = "LSH0600812_850nm_calibration.bmp";
 
+        public class MeshGrid
+        {
+            public MeshGrid(decimal xL, decimal xS, decimal xU, decimal yL, decimal yS, decimal yU)
+            {
+                //xL = x lower, xS = x spacing, x upper
+                //yL = y lower, yS = y spacing, y upper
 
+                int width = int.Parse(Math.Ceiling((xU - xL) / xS).ToString());
+                int height = int.Parse(Math.Ceiling((yU - yL) / yS).ToString());
+
+
+                X = new decimal[width, height];
+                Y = new decimal[width, height];
+                
+                for (int j = 0; j < height; j++)
+                {
+                    for (int i = 0; i < width; i++)
+                    {
+                        X[i, j] = xL + xS * (decimal)i;
+                        Y[i, j] = yL + yS * (decimal)j;
+                    }
+                }
+
+            }
+            public decimal[,] X { get; set; }
+            public decimal[,] Y { get; set; }
+        }
+        
+        public class MatrixMultiply
+        {
+            public MatrixMultiply(decimal[,] mat, decimal scalar)
+            {
+                int xDim = mat.GetUpperBound(0) + 1;
+                int yDim = mat.GetUpperBound(1) + 1;
+                Mat = new decimal[xDim, yDim];
+                for (int i = 0; i < xDim; i++)
+                {
+                    for (int j = 0; j < yDim; j++)
+                    {
+                        Mat[i, j] = mat[i, j] * scalar;
+                    }
+                }
+            }
+            public decimal[,] Mat { get; set; }
+        }
+        
+        public class MatrixAdd
+        {
+            public MatrixAdd(decimal[,] mat1, decimal[,] mat2)
+            {
+                int xDim = mat1.GetUpperBound(0) + 1;
+                int yDim = mat1.GetUpperBound(1) + 1;
+                Mat = new decimal[xDim, yDim];
+                for (int i = 0; i < (xDim-1); i++)
+                {
+                    for (int j = 0; j < (yDim-1); j++)
+                    {
+                        Mat[i, j] = mat1[i, j] + mat2[i, j];
+                    }
+                }
+            }
+            public MatrixAdd(decimal[,] mat1, decimal scalar)
+            {
+                int xDim = mat1.GetUpperBound(0) + 1;
+                int yDim = mat1.GetUpperBound(1) + 1;
+                Mat = new decimal[xDim, yDim];
+                for (int i = 0; i < xDim; i++)
+                {
+                    for (int j = 0; j < yDim; j++)
+                    {
+                        Mat[i, j] = mat1[i, j] + scalar;
+                    }
+                }
+            }
+            public decimal[,] Mat { get; set; }
+        }
+
+        public class MatrixExponential
+        {
+            public MatrixExponential(decimal[,] mat1, decimal scalar)
+            {
+                int xDim = mat1.GetUpperBound(0) + 1;
+                int yDim = mat1.GetUpperBound(1) + 1;
+                Mat = new decimal[xDim, yDim];
+                for (int i = 0; i < xDim; i++)
+                {
+                    for (int j = 0; j < yDim; j++)
+                    {
+                        Mat[i, j] = (decimal)Math.Pow((double)mat1[i, j], (double)scalar);
+                    }
+                }
+            }
+            public decimal[,] Mat { get; set; }
+        }
+
+        public class CartToPol
+        {
+            public CartToPol(decimal[,] xMat,decimal[,] yMat)
+            {
+                int xDim = xMat.GetUpperBound(0) + 1;
+                int yDim = xMat.GetUpperBound(1) + 1;
+                Theta = new decimal[xDim, yDim];
+                Rho = new decimal[xDim, yDim];
+                for (int i = 0; i < (xDim-1); i++)
+                {
+                    for (int j = 0; j < (yDim-1); j++)
+                    {
+                        Theta[i, j] = (decimal)Math.Atan((double)(yMat[i, j]/xMat[i, j]));
+                        Rho[i, j] = (decimal)Math.Sqrt(Math.Pow((double)xMat[i, j], 2) + Math.Pow((double)yMat[i, j], 2));
+                    }
+                }
+            }
+            public decimal[,] Theta { get; set; }
+            public decimal[,] Rho { get; set; }
+        }
+
+        public class MatrixMod
+        {
+            //Modulus after division
+            public MatrixMod(decimal[,] mat1, decimal scalar)
+            {
+                int xDim = mat1.GetUpperBound(0) + 1;
+                int yDim = mat1.GetUpperBound(1) + 1;
+                Mat = new decimal[xDim, yDim];
+                for (int i = 0; i < xDim; i++)
+                {
+                    for (int j = 0; j < yDim; j++)
+                    {
+                        Mat[i, j] = mat1[i, j] % scalar;
+                    }
+                }
+            }
+            public decimal[,] Mat { get; set; }
+        }
+        public class Zeros
+        {
+            //Modulus after division
+            public Zeros(int x, int y)
+            {
+                Mat = new decimal[x, y];
+                for (int i = 0; i < x; i++)
+                {
+                    for (int j = 0; j < y; j++)
+                    {
+                        Mat[i, j] = 0;
+                    }
+                }
+            }
+            public decimal[,] Mat { get; set; }
+        }
 
         private void panelTiltImage_Paint(object sender, PaintEventArgs e)
         {
@@ -271,6 +560,7 @@ namespace WindowsFormsApplication1
 
             }
         }
+
         private void checkBoxCalibration_CheckedChanged(object sender, EventArgs e)
         {
             makeTiltImage();

@@ -167,7 +167,7 @@
             this.textXangle.Name = "textXangle";
             this.textXangle.Size = new System.Drawing.Size(47, 20);
             this.textXangle.TabIndex = 0;
-            this.textXangle.Text = "0";
+            this.textXangle.Text = "0.05";
             // 
             // label2
             // 
