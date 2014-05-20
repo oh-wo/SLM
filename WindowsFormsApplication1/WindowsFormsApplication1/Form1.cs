@@ -278,7 +278,7 @@ namespace WindowsFormsApplication1
         {
             decimal axiconAngle = (decimal)0.3;//degrees
 
-            int vortexCharge = 0;
+            int vortexCharge = 1;
 
            
             
@@ -410,8 +410,12 @@ namespace WindowsFormsApplication1
         Bitmap tiltImage;
         string tiltImageName = "LSH0600812_850nm_calibration.bmp";
 
+        
+
         public decimal[,] Round(decimal[,] mat)
         {
+            
+
             int xDim = mat.GetUpperBound(0) + 1;
             int yDim = mat.GetUpperBound(1) + 1;
             decimal[,] Mat = new decimal[xDim, yDim];
